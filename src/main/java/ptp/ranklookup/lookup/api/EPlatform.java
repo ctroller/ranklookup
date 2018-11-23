@@ -27,7 +27,7 @@ public enum EPlatform {
         return platformId;
     }
 
-    public String getPlatformName() {
+    private String getPlatformName() {
         return platformName;
     }
 

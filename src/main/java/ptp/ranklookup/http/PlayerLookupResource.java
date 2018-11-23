@@ -6,12 +6,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import ptp.ranklookup.lookup.api.EPlatform;
-import ptp.ranklookup.lookup.api.IPlayer;
 import ptp.ranklookup.lookup.api.IPlayerLookupService;
 import ptp.ranklookup.util.ServiceRegistry;
 
@@ -21,7 +19,7 @@ public class PlayerLookupResource {
     @Path("{platform}/{name}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPlayer(@PathParam("platform") String platform, @PathParam("name") String name) throws Exception {
+    public Response getPlayer(@PathParam("platform") String platform, @PathParam("name") String name) {
         try {
             IPlayerLookupService service = ServiceRegistry.getService(IPlayerLookupService.class);
 

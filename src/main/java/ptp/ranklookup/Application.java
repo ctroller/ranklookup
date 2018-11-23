@@ -7,12 +7,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Properties;
-
-import javax.net.ssl.SSLContext;
 
 import ptp.ranklookup.lookup.api.IPlayerLookupService;
 import ptp.ranklookup.lookup.impl.api.PlayerLookupService;

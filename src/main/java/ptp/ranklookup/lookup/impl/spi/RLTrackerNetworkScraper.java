@@ -1,7 +1,6 @@
 package ptp.ranklookup.lookup.impl.spi;
 
 import org.jetbrains.annotations.Nullable;
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -51,15 +50,15 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
             playlistId = id;
         }
 
-        public String getPlaylistName() {
+        String getPlaylistName() {
             return playlistName;
         }
 
-        public int getPlaylistId() {
+        int getPlaylistId() {
             return playlistId;
         }
 
-        public static int getPlaylistIdByName(String playlistName) {
+        static int getPlaylistIdByName(String playlistName) {
             return LOOKUP.get(playlistName);
         }
     }
@@ -89,7 +88,7 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
         return null;
     }
 
-    private static IPlayerData parseResponse(int platformId, Document doc) throws IOException {
+    private static IPlayerData parseResponse(int platformId, Document doc) {
 
         // check for errors
         Elements alertElements = doc.select(".alert.alert-danger");
@@ -159,22 +158,24 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
                 .replace(",", ""));
 
         Matcher playlistStatsMatcher = PSTATS_PATTERN.matcher( row.child(1).child(0).ownText() );
-        playlistStatsMatcher.matches();
+        if( playlistStatsMatcher.matches() ) {
+            extractStatsData(returnValue, season, playlistId, playlistMmr, playlistStatsMatcher);
+        }
+    }
+
+    private static void extractStatsData(PlayerData returnValue, int season, int playlistId, int playlistMmr, Matcher playlistStatsMatcher) {
         String rankGroup;
         String tier;
         String division;
         try {
             rankGroup = playlistStatsMatcher.group(1);
             tier = playlistStatsMatcher.group(2);
-            if( tier != null )
-            {
+            if (tier != null) {
                 tier = tier.trim();
             }
 
             division = playlistStatsMatcher.group(3);
-        }
-        catch( Exception ex )
-        {
+        } catch (Exception ex) {
             rankGroup = ERankGroup.UNRANKED.getRankGroupName();
             tier = null;
             division = null;
@@ -197,7 +198,7 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
     private static final String ROMAN_2 = "II";
     private static final String ROMAN_3 = "III";
     private static final String ROMAN_4 = "IV";
-    private static final int romanToInt( String roman )
+    private static int romanToInt( String roman )
     {
         if( roman == null )
         {

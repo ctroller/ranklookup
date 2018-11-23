@@ -4,7 +4,6 @@ import net.jcip.annotations.Immutable;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class Player implements IPlayer {
 
     private final String name;
     private final EPlatform platform;
-    private Map<Integer, Map<EPlaylist, IPlaylistStats>> playlistStats;
+    private final Map<Integer, Map<EPlaylist, IPlaylistStats>> playlistStats;
     private int latestSeason = -1;
 
 

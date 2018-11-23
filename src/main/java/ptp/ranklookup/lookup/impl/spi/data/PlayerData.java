@@ -1,6 +1,5 @@
 package ptp.ranklookup.lookup.impl.spi.data;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,7 +12,7 @@ public class PlayerData implements IPlayerData {
 
     private String name;
     private int platformId;
-    private Map<Integer, Map<Integer, IPlaylistStatsData>> playlistStats = new LinkedHashMap<>(EPlaylist.values().length);
+    private final Map<Integer, Map<Integer, IPlaylistStatsData>> playlistStats = new LinkedHashMap<>(EPlaylist.values().length);
 
     @Override
     public String getName() {

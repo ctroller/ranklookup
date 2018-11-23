@@ -7,10 +7,10 @@ import ptp.ranklookup.lookup.api.IPlaylistStats;
 
 public class PlaylistStats implements IPlaylistStats, Serializable {
 
-    private int mmr;
-    private ERankGroup group;
-    private Integer tier;
-    private int division;
+    private final int mmr;
+    private final ERankGroup group;
+    private final Integer tier;
+    private final int division;
 
     PlaylistStats(int mmr, ERankGroup group, Integer tier, int division) {
         this.mmr = mmr;
