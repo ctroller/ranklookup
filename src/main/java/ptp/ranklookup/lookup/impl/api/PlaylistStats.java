@@ -1,9 +1,11 @@
 package ptp.ranklookup.lookup.impl.api;
 
+import java.io.Serializable;
+
 import ptp.ranklookup.lookup.api.ERankGroup;
 import ptp.ranklookup.lookup.api.IPlaylistStats;
 
-public class PlaylistStats implements IPlaylistStats {
+public class PlaylistStats implements IPlaylistStats, Serializable {
 
     private int mmr;
     private ERankGroup group;

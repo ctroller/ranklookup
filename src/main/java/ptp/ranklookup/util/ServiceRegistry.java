@@ -1,19 +1,25 @@
 package ptp.ranklookup.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
+@SuppressWarnings( "unchecked" )
 public class ServiceRegistry {
-    private static final Map<Class<?>, WeakReference<ServiceLoader<?>>> REFERENCE_MAP = new ConcurrentHashMap<>(10);
+    private static final Map<Class<?>, List<?>> REFERENCE_MAP = new ConcurrentHashMap<>(10);
 
     private ServiceRegistry ()
     {
+    }
+
+    public static <T> void register( Class<T> clazz, T service )
+    {
+        ((List<T>) REFERENCE_MAP.computeIfAbsent(clazz, k -> new CopyOnWriteArrayList<>())).add(service);
     }
 
     /**
@@ -25,8 +31,7 @@ public class ServiceRegistry {
      * @throws java.util.NoSuchElementException if there is no service registered for given class
      */
     public static <T> T getService(Class<T> clazz) {
-        return getServiceLoader(clazz).findFirst()
-                .orElseThrow();
+        return (T) REFERENCE_MAP.get( clazz ).get(0);
     }
 
     /**
@@ -37,14 +42,7 @@ public class ServiceRegistry {
      * @return the found services as an iterator
      */
     @NotNull
-    public static <T> Iterable<T> getServices(Class<T> clazz) {
-        return getServiceLoader(clazz);
-    }
-
-    @NotNull
-    @SuppressWarnings( "unchecked" )
-    private static <T> ServiceLoader<T> getServiceLoader(Class<T> clazz) {
-        return (ServiceLoader<T>) REFERENCE_MAP.computeIfAbsent(clazz, k -> new WeakReference<>(ServiceLoader.load(clazz)))
-                .get();
+    public static <T> List<T> getServices(Class<T> clazz) {
+        return (List<T>) REFERENCE_MAP.get(clazz);
     }
 }

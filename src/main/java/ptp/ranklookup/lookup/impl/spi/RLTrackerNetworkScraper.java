@@ -70,20 +70,26 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
     }
 
     private static IPlayerData lookupPlayer(int platformId, String name) {
+        String url = getBaseUrl(platformId) + name;
         try {
-            Connection.Response response = Jsoup.connect(getBaseUrl(platformId) + name)
-                    .execute();
+            Document doc = Jsoup.connect( url )
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0")
+                    .timeout( 60000 )
+                    .get();
 
-            return parseResponse(platformId, response);
+            return parseResponse(platformId, doc);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        catch( RLTrackerException e )
+        {
+            throw new RLTrackerException( "URL: " + url + ", error: \n" + e.getMessage() );
         }
 
         return null;
     }
 
-    private static IPlayerData parseResponse(int platformId, Connection.Response response) throws IOException {
-        Document doc = response.parse();
+    private static IPlayerData parseResponse(int platformId, Document doc) throws IOException {
 
         // check for errors
         Elements alertElements = doc.select(".alert.alert-danger");
@@ -92,8 +98,7 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
                     .map(Element::text)
                     .collect(Collectors.joining("\n"));
 
-            throw new RLTrackerException(appendedMessage + "\nUrl: " + response.url()
-                    .toString());
+            throw new RLTrackerException(appendedMessage);
         }
 
         return parsePlayer(platformId, doc);
@@ -223,7 +228,7 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
             case STEAM:
                 returnValue += "steam/";
                 break;
-            case PS4:
+            case PSN:
                 returnValue += "steam/";
                 break;
             case XBOX:

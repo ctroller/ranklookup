@@ -4,6 +4,7 @@ import net.jcip.annotations.Immutable;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,8 @@ import ptp.ranklookup.lookup.spi.data.IPlaylistStatsData;
 
 @Immutable
 public class Player implements IPlayer {
+    private static final long serialVersionUID = 2018_11_23_001L;
+
     private final String name;
     private final EPlatform platform;
     private Map<Integer, Map<EPlaylist, IPlaylistStats>> playlistStats;
@@ -76,6 +79,11 @@ public class Player implements IPlayer {
     @Override
     public @NotNull Map<EPlaylist, IPlaylistStats> getLatestSeasonPlaylistStats() {
         return getPlaylistStats(latestSeason);
+    }
+
+    @Override
+    public @NotNull Map<Integer, Map<EPlaylist, IPlaylistStats>> getAllPlaylistStats() {
+        return playlistStats;
     }
 
     @Override

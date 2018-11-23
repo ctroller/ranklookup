@@ -2,9 +2,10 @@ package ptp.ranklookup.lookup.api;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public interface IPlayer {
+public interface IPlayer extends Serializable {
     @NotNull
     String getName();
 
@@ -16,4 +17,7 @@ public interface IPlayer {
 
     @NotNull
     Map<EPlaylist, IPlaylistStats> getLatestSeasonPlaylistStats ();
+
+    @NotNull
+    Map<Integer, Map<EPlaylist, IPlaylistStats>> getAllPlaylistStats ();
 }

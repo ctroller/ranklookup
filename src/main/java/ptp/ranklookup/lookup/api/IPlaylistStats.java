@@ -1,6 +1,8 @@
 package ptp.ranklookup.lookup.api;
 
-public interface IPlaylistStats {
+import java.io.Serializable;
+
+public interface IPlaylistStats extends Serializable {
     int getMMR();
 
     ERankGroup getRankGroup();
