@@ -7,12 +7,13 @@ import java.util.Map;
 
 import ptp.ranklookup.lookup.api.EPlaylist;
 import ptp.ranklookup.lookup.spi.data.IPlayerData;
+import ptp.ranklookup.lookup.spi.data.IPlaylistStatsData;
 
 public class PlayerData implements IPlayerData {
 
     private String name;
     private int platformId;
-    private Map<Integer, Map<Integer, Integer>> playlistStats = new LinkedHashMap<>(EPlaylist.values().length);
+    private Map<Integer, Map<Integer, IPlaylistStatsData>> playlistStats = new LinkedHashMap<>(EPlaylist.values().length);
 
     @Override
     public String getName() {
@@ -33,13 +34,13 @@ public class PlayerData implements IPlayerData {
     }
 
     @Override
-    public Map<Integer, Map<Integer, Integer>> getPlaylistStats() {
+    public Map<Integer, Map<Integer, IPlaylistStatsData>> getPlaylistStats() {
         return playlistStats;
     }
 
-    public void addPlaylistStats( int season, int playlistId, int mmr )
+    public void addPlaylistStats( int season, int playlistId, IPlaylistStatsData data )
     {
         playlistStats.computeIfAbsent(season, k -> new HashMap<>(5))
-                .put(playlistId, mmr);
+                .put(playlistId, data);
     }
 }

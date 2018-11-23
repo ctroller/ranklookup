@@ -7,5 +7,5 @@ public interface IPlayerData {
 
     int getPlatformId ();
 
-    Map<Integer, Map<Integer, Integer>> getPlaylistStats();
+    Map<Integer, Map<Integer, IPlaylistStatsData>> getPlaylistStats();
 }

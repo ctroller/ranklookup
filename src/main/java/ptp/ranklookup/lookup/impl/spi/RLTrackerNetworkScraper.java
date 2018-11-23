@@ -9,13 +9,16 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ptp.ranklookup.lookup.api.EPlatform;
 import ptp.ranklookup.lookup.api.EPlaylist;
+import ptp.ranklookup.lookup.api.ERankGroup;
 import ptp.ranklookup.lookup.impl.spi.data.PlayerData;
+import ptp.ranklookup.lookup.impl.spi.data.PlaylistStatsData;
 import ptp.ranklookup.lookup.spi.IPlayerDataProvider;
 import ptp.ranklookup.lookup.spi.data.IPlayerData;
 
@@ -26,7 +29,7 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
     private static final String REWARD_LEVEL_ID = "Reward Level";
 
     // playlist names to id
-    private enum PlaylistName {
+    private enum EPlaylistName {
         UNRANKED("Un-Ranked", EPlaylist.UNRANKED.getPlaylistId()),
         SOLO("Ranked Duel 1v1", EPlaylist.RANKED_SOLO.getPlaylistId()),
         DOUBLES("Ranked Doubles 2v2", EPlaylist.RANKED_DUO.getPlaylistId()),
@@ -38,12 +41,12 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
         SNOWDAY("Snowday", EPlaylist.RANKED_SNOWDAY.getPlaylistId());
 
         private static final Map<String, Integer> LOOKUP = Stream.of(values())
-                .collect(Collectors.toMap(PlaylistName::getPlaylistName, PlaylistName::getPlaylistId));
+                .collect(Collectors.toMap(EPlaylistName::getPlaylistName, EPlaylistName::getPlaylistId));
 
         private final String playlistName;
         private final int playlistId;
 
-        PlaylistName(String name, int id) {
+        EPlaylistName(String name, int id) {
             playlistName = name;
             playlistId = id;
         }
@@ -140,6 +143,7 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
 
     }
 
+    private static final Pattern PSTATS_PATTERN = Pattern.compile( "(Unranked|Bronze|Silver|Gold|Platinum|Diamond|Champion|Grand Champion) (I{1,3} )?Division (I{1,3}V?)" );
     private static void parsePlaylistRow(PlayerData returnValue, int season, Element row, boolean hasDivUpDownRows) {
         String playlistName = row.child(1)
                 .ownText();
@@ -149,11 +153,68 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
                 .ownText()
                 .replace(",", ""));
 
-        returnValue.addPlaylistStats(season, playlistId, playlistMmr);
+        Matcher playlistStatsMatcher = PSTATS_PATTERN.matcher( row.child(1).child(0).ownText() );
+        playlistStatsMatcher.matches();
+        String rankGroup;
+        String tier;
+        String division;
+        try {
+            rankGroup = playlistStatsMatcher.group(1);
+            tier = playlistStatsMatcher.group(2);
+            if( tier != null )
+            {
+                tier = tier.trim();
+            }
+
+            division = playlistStatsMatcher.group(3);
+        }
+        catch( Exception ex )
+        {
+            rankGroup = ERankGroup.UNRANKED.getRankGroupName();
+            tier = null;
+            division = null;
+        }
+
+
+        Integer tierInt = tier != null ? romanToInt(tier) : null;
+        int divisionInt = romanToInt(division);
+
+        PlaylistStatsData data = new PlaylistStatsData();
+        data.setMmr(playlistMmr);
+        data.setDivision(divisionInt);
+        data.setTier(tierInt);
+        data.setRankGroupId(ERankGroup.forName(rankGroup)
+                .getRankGroupId());
+        returnValue.addPlaylistStats(season, playlistId, data);
+    }
+
+    private static final String ROMAN_1 = "I";
+    private static final String ROMAN_2 = "II";
+    private static final String ROMAN_3 = "III";
+    private static final String ROMAN_4 = "IV";
+    private static final int romanToInt( String roman )
+    {
+        if( roman == null )
+        {
+            return 1;
+        }
+
+       switch( roman )
+       {
+           case ROMAN_1:
+               return 1;
+           case ROMAN_2:
+               return 2;
+           case ROMAN_3:
+               return 3;
+           case ROMAN_4:
+               return 4;
+           default: return -1;
+       }
     }
 
     private static int getPlaylistId(String playlistName) {
-        return PlaylistName.getPlaylistIdByName(playlistName);
+        return EPlaylistName.getPlaylistIdByName(playlistName);
     }
 
     private static String getBaseUrl(int platformId) {

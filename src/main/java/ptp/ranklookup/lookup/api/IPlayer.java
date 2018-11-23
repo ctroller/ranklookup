@@ -12,8 +12,8 @@ public interface IPlayer {
     EPlatform getPlatform();
 
     @NotNull
-    Map<EPlaylist, Integer> getPlaylistStats ( int season );
+    Map<EPlaylist, IPlaylistStats> getPlaylistStats ( int season );
 
     @NotNull
-    Map<EPlaylist, Integer> getLatestSeasonPlaylistStats ();
+    Map<EPlaylist, IPlaylistStats> getLatestSeasonPlaylistStats ();
 }

@@ -10,14 +10,17 @@ import java.util.Map;
 
 import ptp.ranklookup.lookup.api.EPlatform;
 import ptp.ranklookup.lookup.api.EPlaylist;
+import ptp.ranklookup.lookup.api.ERankGroup;
 import ptp.ranklookup.lookup.api.IPlayer;
+import ptp.ranklookup.lookup.api.IPlaylistStats;
 import ptp.ranklookup.lookup.spi.data.IPlayerData;
+import ptp.ranklookup.lookup.spi.data.IPlaylistStatsData;
 
 @Immutable
 public class Player implements IPlayer {
     private final String name;
     private final EPlatform platform;
-    private Map<Integer, Map<EPlaylist, Integer>> playlistStats;
+    private Map<Integer, Map<EPlaylist, IPlaylistStats>> playlistStats;
     private int latestSeason = -1;
 
 
@@ -27,26 +30,30 @@ public class Player implements IPlayer {
         playlistStats = computePlaylistStats(data.getPlaylistStats());
     }
 
-    private Map<Integer, Map<EPlaylist, Integer>> computePlaylistStats(Map<Integer, Map<Integer, Integer>> playlistStats) {
-        Map<Integer, Map<EPlaylist, Integer>> returnValue = new HashMap<>();
+    private Map<Integer, Map<EPlaylist, IPlaylistStats>> computePlaylistStats(Map<Integer, Map<Integer, IPlaylistStatsData>> playlistStats) {
+        Map<Integer, Map<EPlaylist, IPlaylistStats>> returnValue = new HashMap<>();
         int latestSeason = -1;
-        for (Map.Entry<Integer, Map<Integer, Integer>> outer : playlistStats.entrySet()) {
+        for (Map.Entry<Integer, Map<Integer, IPlaylistStatsData>> outer : playlistStats.entrySet()) {
             int season = outer.getKey();
             if (season > latestSeason) {
                 latestSeason = season;
             }
 
-            Map<EPlaylist, Integer> seasonMap = new HashMap<>();
+            Map<EPlaylist, IPlaylistStats> seasonMap = new HashMap<>();
             returnValue.put(season, seasonMap);
-            for (Map.Entry<Integer, Integer> seasonStats : outer.getValue()
+            for (Map.Entry<Integer, IPlaylistStatsData> seasonStats : outer.getValue()
                     .entrySet()) {
-                seasonMap.put(EPlaylist.forId(seasonStats.getKey()), seasonStats.getValue());
+                seasonMap.put(EPlaylist.forId(seasonStats.getKey()), computeStats( seasonStats.getValue() ) );
             }
         }
 
         this.latestSeason = latestSeason;
 
         return returnValue;
+    }
+
+    private IPlaylistStats computeStats(IPlaylistStatsData value) {
+        return new PlaylistStats( value.getMMR(), ERankGroup.forId( value.getRankGroupId() ), value.getTier(), value.getDivision() );
     }
 
     @Override
@@ -62,12 +69,12 @@ public class Player implements IPlayer {
     }
 
     @Override
-    public @NotNull Map<EPlaylist, Integer> getPlaylistStats(int season) {
+    public @NotNull Map<EPlaylist, IPlaylistStats> getPlaylistStats(int season) {
         return playlistStats.getOrDefault(season, Collections.emptyMap());
     }
 
     @Override
-    public @NotNull Map<EPlaylist, Integer> getLatestSeasonPlaylistStats() {
+    public @NotNull Map<EPlaylist, IPlaylistStats> getLatestSeasonPlaylistStats() {
         return getPlaylistStats(latestSeason);
     }
 
@@ -82,11 +89,11 @@ public class Player implements IPlayer {
 
     private String getPlaylistStatsString() {
         StringBuilder returnValue = new StringBuilder();
-        for (Map.Entry<Integer, Map<EPlaylist, Integer>> entry : playlistStats.entrySet()) {
+        for (Map.Entry<Integer, Map<EPlaylist, IPlaylistStats>> entry : playlistStats.entrySet()) {
             returnValue.append("\nSeason ")
                     .append(entry.getKey())
                     .append(": \n");
-            for (Map.Entry<EPlaylist, Integer> stats : entry.getValue()
+            for (Map.Entry<EPlaylist, IPlaylistStats> stats : entry.getValue()
                     .entrySet()) {
                 returnValue.append("    ");
                 returnValue.append(stats.getKey())
