@@ -19,4 +19,4 @@ RUN mvn package
 EXPOSE 8080
 
 # execute it
-CMD mvn exec:java -Dexec.args="-Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8080"
+CMD ["mvn", "exec:java"]
