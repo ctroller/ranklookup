@@ -1,4 +1,4 @@
-package ptp.ranklookup.scraper.api;
+package ptp.ranklookup.lookup.api;
 
 import org.jetbrains.annotations.Nullable;
 

@@ -1,9 +1,8 @@
-package ptp.ranklookup.scraper.spi;
+package ptp.ranklookup.lookup.spi;
 
 import org.jetbrains.annotations.Nullable;
 
-import ptp.ranklookup.scraper.api.EPlatform;
-import ptp.ranklookup.scraper.spi.data.IPlayerData;
+import ptp.ranklookup.lookup.spi.data.IPlayerData;
 
 /**
  * Service provider interface to look up player ranks

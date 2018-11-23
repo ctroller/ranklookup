@@ -37,8 +37,8 @@ public class ServiceRegistry {
      * @return the found services as an iterator
      */
     @NotNull
-    public static <T> Iterator<T> getServices(Class<T> clazz) {
-        return getServiceLoader(clazz).iterator();
+    public static <T> Iterable<T> getServices(Class<T> clazz) {
+        return getServiceLoader(clazz);
     }
 
     @NotNull
