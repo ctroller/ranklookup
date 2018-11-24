@@ -230,10 +230,10 @@ public class RLTrackerNetworkScraper implements IPlayerDataProvider {
                 returnValue += "steam/";
                 break;
             case PSN:
-                returnValue += "steam/";
+                returnValue += "ps/";
                 break;
             case XBOX:
-                returnValue += "steam/";
+                returnValue += "xbox/";
                 break;
             default:
                 throw new IllegalArgumentException(String.format("Platform %s (id %d) not supported.", EPlatform.forId(platformId), platformId));
